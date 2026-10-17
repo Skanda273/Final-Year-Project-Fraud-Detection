@@ -1,0 +1,32 @@
+# Dependencies
+node_modules/
+*/node_modules/
+
+# Environment variables & secrets
+.env
+*/.env
+*.env.local
+
+# Python
+__pycache__/
+*/__pycache__/
+*.py[cod]
+*$py.class
+venv/
+env/
+.venv/
+
+# Build artifacts
+dist/
+build/
+.cache/
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Large raw dataset (exceeds GitHub 100MB limit)
+**/creditcard.csv
+creditcard.csv
+creditcard.csv.zip
+*.joblib
