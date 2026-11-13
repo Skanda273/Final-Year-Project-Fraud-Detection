@@ -24,14 +24,47 @@ const Login = ({ onLogin, onSwitchToRegister }) => {
 
       if (response.ok) {
         onLogin(data);
+        return;
       } else {
-        setError(data.error || 'Login failed');
+        // If server returned an error (e.g. invalid credentials)
+        // Check offline registered users as fallback
+        const localUsers = JSON.parse(localStorage.getItem('fraud_demo_users') || '{}');
+        const found = localUsers[username.toLowerCase().trim()];
+        if (found && found.password === password) {
+          onLogin({
+            token: 'demo-token-' + Date.now(),
+            user: { username: found.username, role: found.role || 'admin' }
+          });
+          return;
+        }
+        setError(data.error || 'Invalid credentials');
       }
     } catch (err) {
-      setError('Connection to auth server failed');
+      // Backend unreachable (e.g. running on Vercel without deployed backend)
+      const localUsers = JSON.parse(localStorage.getItem('fraud_demo_users') || '{}');
+      const found = localUsers[username.toLowerCase().trim()];
+      if (found && found.password === password) {
+        onLogin({
+          token: 'demo-token-' + Date.now(),
+          user: { username: found.username, role: found.role || 'admin' }
+        });
+        return;
+      }
+      // Allow instant access so visitors on Vercel can test without a setup
+      onLogin({
+        token: 'demo-token-' + Date.now(),
+        user: { username: username.trim() || 'Security Officer', role: 'admin' }
+      });
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleQuickDemo = () => {
+    onLogin({
+      token: 'demo-token-' + Date.now(),
+      user: { username: 'Admin Evaluator', role: 'admin' }
+    });
   };
 
   return (
@@ -89,6 +122,14 @@ const Login = ({ onLogin, onSwitchToRegister }) => {
           >
             {loading ? 'Authenticating...' : 'Sign In'}
             {!loading && <ArrowRight size={18} />}
+          </button>
+
+          <button
+            type="button"
+            onClick={handleQuickDemo}
+            className="w-full bg-slate-900 hover:bg-slate-800 text-slate-300 text-xs font-semibold py-3 px-4 rounded-xl border border-slate-800 flex items-center justify-center gap-2 transition-all"
+          >
+            🚀 1-Click Instant Demo Access (No password needed)
           </button>
         </form>
 
