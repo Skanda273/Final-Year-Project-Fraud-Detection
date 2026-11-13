@@ -1,9 +1,22 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
+const mongoose = require('mongoose');
 const User = require('../models/User');
 const router = express.Router();
 
 const JWT_SECRET = process.env.JWT_SECRET || 'supersecretkey_fraud_detection';
+
+// Middleware to check database connection status
+const checkDbConnection = (req, res, next) => {
+    if (mongoose.connection.readyState !== 1) {
+        return res.status(503).json({
+            error: 'Database not connected. Please ensure MongoDB is running (locally on port 27017 or via MongoDB Atlas in backend/.env).'
+        });
+    }
+    next();
+};
+
+router.use(checkDbConnection);
 
 // Register Route
 router.post('/register', async (req, res) => {

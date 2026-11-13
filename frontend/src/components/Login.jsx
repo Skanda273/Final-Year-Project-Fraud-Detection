@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ShieldCheck, User, Lock, ArrowRight } from 'lucide-react';
+import { API_BASE_URL } from '../config';
 
 const Login = ({ onLogin, onSwitchToRegister }) => {
   const [username, setUsername] = useState('');
@@ -13,7 +14,7 @@ const Login = ({ onLogin, onSwitchToRegister }) => {
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:5000/api/v1/auth/login', {
+      const response = await fetch(`${API_BASE_URL}/api/v1/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password })

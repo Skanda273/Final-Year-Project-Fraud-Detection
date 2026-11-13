@@ -11,8 +11,9 @@ import {
 } from 'lucide-react';
 import { io } from 'socket.io-client';
 import { SAMPLE_GENUINE_NOTE, SAMPLE_COUNTERFEIT_NOTE } from '../sampleNotes';
+import { API_BASE_URL, SOCKET_URL } from '../config';
 
-const socket = io('http://localhost:5000');
+const socket = io(SOCKET_URL);
 
 // Card brand detector
 const getCardBrand = (num) => {
@@ -129,7 +130,7 @@ const Dashboard = ({ user, activeTab, setActiveTab }) => {
       if (typeFilter && typeFilter !== 'ALL') q.set('type', typeFilter);
       q.set('search', query);
       q.set('limit', '50');
-      const res = await fetch(`http://localhost:5000/api/v1/transactions?${q.toString()}`);
+      const res = await fetch(`${API_BASE_URL}/api/v1/transactions?${q.toString()}`);
       const json = await res.json();
       if (json.success && Array.isArray(json.data)) {
         setDbTransactions(json.data);
@@ -188,7 +189,7 @@ const Dashboard = ({ user, activeTab, setActiveTab }) => {
     setFetchMessage('');
     setFetchError('');
     try {
-      const res = await fetch(`http://localhost:5000/api/v1/transactions/lookup/${encodeURIComponent(id)}`);
+      const res = await fetch(`${API_BASE_URL}/api/v1/transactions/lookup/${encodeURIComponent(id)}`);
       const result = await res.json();
       if (res.ok && result.success && result.data) {
         const d = result.data;
@@ -220,7 +221,7 @@ const Dashboard = ({ user, activeTab, setActiveTab }) => {
     setFetchMessage('');
     setFetchError('');
     try {
-      const res = await fetch(`http://localhost:5000/api/v1/transactions/lookup/${encodeURIComponent(id)}`);
+      const res = await fetch(`${API_BASE_URL}/api/v1/transactions/lookup/${encodeURIComponent(id)}`);
       const result = await res.json();
       if (res.ok && result.success && result.data) {
         const d = result.data;
@@ -375,7 +376,7 @@ const Dashboard = ({ user, activeTab, setActiveTab }) => {
     });
 
     // Fetch initial currency audit history
-    fetch('http://localhost:5000/api/v1/currency/history')
+    fetch(`${API_BASE_URL}/api/v1/currency/history`)
       .then(res => res.json())
       .then(resData => {
         if (resData.success && Array.isArray(resData.data)) {
@@ -439,7 +440,7 @@ const Dashboard = ({ user, activeTab, setActiveTab }) => {
       await new Promise(r => setTimeout(r, 600));
       setCurrencyScanStep('Executing Deep Convolutional Neural Network (CNN)...');
 
-      const response = await fetch('http://localhost:5000/api/v1/currency/scan', {
+      const response = await fetch(`${API_BASE_URL}/api/v1/currency/scan`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -482,7 +483,7 @@ const Dashboard = ({ user, activeTab, setActiveTab }) => {
           }
         : { type: 'UPI', ...upiData, amount: upiData.amount ? parseFloat(upiData.amount) : undefined };
       
-      const response = await fetch('http://localhost:5000/api/v1/transactions/analyze', {
+      const response = await fetch(`${API_BASE_URL}/api/v1/transactions/analyze`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
